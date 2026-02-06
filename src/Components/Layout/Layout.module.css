@@ -22,6 +22,34 @@
   background-color: #f5f7fa;
 }
 
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f5f7fa;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingContainer p {
+  margin-top: 16px;
+  color: #64748b;
+  font-size: 14px;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .main-content.sidebar-open {

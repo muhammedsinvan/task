@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
-import { 
-  FaTachometerAlt, 
-  FaUsers, 
-  FaUserFriends, 
-  FaCog, 
-} from 'react-icons/fa';
-import Layout from '../Components/Layout/Layout';
 
 const Dashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -27,7 +20,6 @@ const Dashboard = () => {
       return;
     }
     
-    // Get user data from localStorage
     try {
       const storedUser = localStorage.getItem('user');
       if (storedUser && storedUser !== 'undefined') {

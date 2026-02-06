@@ -15,7 +15,13 @@ const Sidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.clear();
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('token_expiry');
+  localStorage.removeItem('company_id');
+  localStorage.removeItem('selected_company');
+  localStorage.removeItem('company_name');
     navigate('/login');
   };
 

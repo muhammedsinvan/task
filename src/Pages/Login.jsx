@@ -17,6 +17,16 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    const user = localStorage.getItem('user');
+    
+    if (token && user) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
   // Get user's IP address on component mount
   useEffect(() => {
     const getIPAddress = async () => {
@@ -27,7 +37,6 @@ const Login = () => {
           ip_address: response.data.ip
         }));
       } catch (error) {
-        // Fallback IP or empty
         setFormData(prev => ({
           ...prev,
           ip_address: ''
@@ -53,7 +62,6 @@ const Login = () => {
       ...prev,
       [id]: value,
     }));
-    // Clear error when user starts typing
     if (errorMessage) setErrorMessage('');
   };
 
@@ -74,29 +82,33 @@ const Login = () => {
         formData,
       );
 
-       if (response.data.companies && response.data.companies.length === 1) {
-        // Single company - automatically select it
-        const company = response.data.companies[0];
-        localStorage.setItem('selected_company', JSON.stringify(company));
-        localStorage.setItem('company_id', company.id);
-        localStorage.setItem('company_name', company.company_name);
-        navigate('/dashboard');
-      } else {
-        // No companies - show error or redirect
-        console.error('No companies associated with user');
-        setErrorMessage('No companies found for this account. Please contact administrator.');
-      }
+      console.log('Login response:', response.data); // Debug log
 
+      // Check if login was successful
       if (response.data.access_token) {
-        // Successful login without OTP
+        // Successful login
         const { access_token, refresh_token, expires_at, user } = response.data;
         
         // Store tokens and user data
         localStorage.setItem('access_token', access_token);
-        localStorage.setItem('refresh_token', refresh_token);
+        if (refresh_token) {
+          localStorage.setItem('refresh_token', refresh_token);
+        }
         localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('token_expiry', expires_at);
+        if (expires_at) {
+          localStorage.setItem('token_expiry', expires_at);
+        }
         
+        // Handle company data
+        if (response.data.companies && response.data.companies.length > 0) {
+          // Store first company by default
+          const company = response.data.companies[0];
+          localStorage.setItem('selected_company', JSON.stringify(company));
+          localStorage.setItem('company_id', company.id);
+          localStorage.setItem('company_name', company.company_name);
+        }
+        
+        // Remember me
         if (rememberMe) {
           localStorage.setItem('remember_me', 'true');
           localStorage.setItem('saved_email', formData.email);
@@ -105,13 +117,14 @@ const Login = () => {
           localStorage.removeItem('saved_email');
         }
 
-        if (response.data.role_id === 1) { 
-          navigate('/dashboard');
-        }
-
+        // Navigate to dashboard
         navigate('/dashboard');
 
+      } else if (response.data.message) {
+        // Server returned error message
+        setErrorMessage(response.data.message);
       } else {
+        // Unexpected response
         setErrorMessage('Unexpected response from server');
       }
 
